@@ -1,0 +1,25 @@
+{
+  "name": "blob-monitor-function",
+  "version": "1.0.0",
+  "description": "Azure Function to monitor blob storage for PNG files and archive them",
+  "main": "src/functions/*.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "prestart": "npm run build",
+    "start": "node src/local-runner.js",
+    "test-local": "npm run build && node dist/src/test-runner.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@azure/functions": "^4.5.1",
+    "@azure/storage-blob": "^12.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.6.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

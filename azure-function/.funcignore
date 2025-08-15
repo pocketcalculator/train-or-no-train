@@ -1,0 +1,49 @@
+# Exclude from Azure Function deployment
+
+# Source files (we deploy compiled JS)
+*.ts
+tsconfig.json
+src/
+
+# Development dependencies
+node_modules/.bin/
+.nyc_output/
+coverage/
+
+# Build and test artifacts
+test-scripts/
+test-data/
+azurite-data/
+azurite-debug.log
+
+# Documentation
+README.md
+*.md
+
+# Infrastructure files
+infrastructure/
+deploy-to-azure.sh
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Git files
+.git/
+.gitignore
+
+# Logs
+logs/
+*.log
+
+# Environment files for local development
+.env
+.env.local
+
+# Temporary files
+tmp/
+temp/
