@@ -22,7 +22,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 tf.get_logger().setLevel('ERROR')
 
 class ModelTester:
-    def __init__(self, model_path: str = "../models/train_detection_model.h5"):
+    def __init__(self, model_path: str = "models/train_detection_model.h5"):
         """Initialize model tester."""
         self.model_path = model_path
         self.model = None
@@ -44,7 +44,7 @@ class ModelTester:
             print(f"✅ Model loaded from: {self.model_path}")
             
             # Try to get model configuration from training results
-            config_path = "../models/training_results.json"
+            config_path = "models/training_results.json"
             if os.path.exists(config_path):
                 with open(config_path, 'r') as f:
                     config = json.load(f)
@@ -340,7 +340,7 @@ def main():
     print("=" * 35)
     
     # Check if model exists
-    model_path = "../models/train_detection_model.h5"
+    model_path = "models/train_detection_model.h5"
     if not os.path.exists(model_path):
         print(f"❌ Model not found at: {model_path}")
         print(f"📝 Please train a model first using: python src/train_model.py")

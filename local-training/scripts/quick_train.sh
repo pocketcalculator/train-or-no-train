@@ -3,6 +3,12 @@
 
 set -e
 
+# Parse command line arguments
+FORCE_TRAIN=false
+if [ "$1" = "--force" ] || [ "$1" = "-f" ]; then
+    FORCE_TRAIN=true
+fi
+
 # Ensure we're in the right directory
 cd "$(dirname "$0")/.."
 
@@ -42,10 +48,17 @@ if [ "$train_count" -lt 20 ] || [ "$no_train_count" -lt 20 ]; then
     echo "⚠️ Warning: Very small dataset (recommend 100+ images per category)"
     echo "Training may not produce good results."
     echo ""
-    read -p "Continue anyway? (y/n): " continue_choice
-    if [ "$continue_choice" != "y" ]; then
-        echo "❌ Training cancelled"
-        exit 1
+    
+    if [ "$FORCE_TRAIN" = true ]; then
+        echo "🔥 Force mode enabled - proceeding with training..."
+    else
+        read -p "Continue anyway? (y/n): " continue_choice
+        if [ "$continue_choice" != "y" ]; then
+            echo "❌ Training cancelled"
+            echo ""
+            echo "💡 Tip: Use '--force' flag to skip this prompt: ./scripts/quick_train.sh --force"
+            exit 1
+        fi
     fi
 fi
 

@@ -224,7 +224,7 @@ class TrainDetectionModel:
                 verbose=1
             ),
             ModelCheckpoint(
-                '../models/best_train_detection_model.h5',
+                'models/best_train_detection_model.h5',
                 monitor='val_loss',
                 save_best_only=True,
                 verbose=1
@@ -276,7 +276,7 @@ class TrainDetectionModel:
         
         return results
     
-    def plot_training_history(self, save_path: str = "../models/training_history.png"):
+    def plot_training_history(self, save_path: str = "models/training_history.png"):
         """Plot training history."""
         if self.history is None:
             print("❌ No training history available. Train the model first.")
@@ -359,7 +359,7 @@ class TrainDetectionModel:
         plt.title('Confusion Matrix')
         plt.ylabel('True Label')
         plt.xlabel('Predicted Label')
-        plt.savefig('../models/confusion_matrix.png', dpi=300, bbox_inches='tight')
+        plt.savefig('models/confusion_matrix.png', dpi=300, bbox_inches='tight')
         plt.show()
         
         results = {
@@ -421,7 +421,7 @@ class TrainDetectionModel:
         except Exception as e:
             return {"error": str(e), "image_path": image_path}
     
-    def save_model(self, filepath: str = "../models/train_detection_model.h5"):
+    def save_model(self, filepath: str = "models/train_detection_model.h5"):
         """Save the trained model."""
         if self.model is None:
             raise ValueError("No model to save. Train a model first.")
@@ -456,7 +456,7 @@ def main():
     LEARNING_RATE = 0.001
     
     # Default dataset path (relative to current directory)
-    default_dataset_path = "../dataset"
+    default_dataset_path = "dataset"
     
     # Get dataset path
     print(f"📂 Dataset location")
@@ -516,7 +516,7 @@ def main():
     model.save_model()
     
     # Save training results
-    results_path = "../models/training_results.json"
+    results_path = "models/training_results.json"
     os.makedirs(os.path.dirname(results_path), exist_ok=True)
     with open(results_path, "w") as f:
         json.dump(training_results, f, indent=2)
@@ -534,10 +534,10 @@ def main():
     print(f"   - Epochs Trained: {training_results['epochs_trained']}")
     print()
     print(f"💾 Files created:")
-    print(f"   - Model: ../models/train_detection_model.h5")
-    print(f"   - Best model: ../models/best_train_detection_model.h5")
-    print(f"   - Training plots: ../models/training_history.png")
-    print(f"   - Results: ../models/training_results.json")
+    print(f"   - Model: models/train_detection_model.h5")
+    print(f"   - Best model: models/best_train_detection_model.h5")
+    print(f"   - Training plots: models/training_history.png")
+    print(f"   - Results: models/training_results.json")
     
     # Test single image prediction
     print(f"\n🔍 Test single image prediction")
