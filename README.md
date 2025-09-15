@@ -1,8 +1,8 @@
-# Train Detection System
+# Problem & Solution Overview
 
-A complete AI-powered train detection system combining local machine learning with Azure cloud services for real-time monitoring of railroad tracks.
+This is a solution to address automobile and pedestrian traffic problems created by stopped/parked trains.  This AI-powered train detection system combines local machine learning and edge device image detection with Azure cloud services for real-time monitoring and alerting of intersections impeded by stopped freight trains.
 
-## 🎯 Overview
+## 🎯 Technical Overview
 
 This project provides an end-to-end solution for detecting trains in railroad track images using:
 
