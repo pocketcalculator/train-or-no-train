@@ -122,6 +122,45 @@ dist
 # TernJS port file
 .tern-port
 
+# Python virtual environments
+venv/
+env/
+.venv/
+.env/
+ENV/
+env.bak/
+venv.bak/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# ML/AI specific
+*.h5
+*.pkl
+*.joblib
+models/
+dataset/
+data/
+*.tflite
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyTorch
+*.pt
+*.pth
+
+# TensorFlow
+*.pb
+saved_model/
+
+# Azure specific
+.azure/
+local.settings.json
+
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
 
