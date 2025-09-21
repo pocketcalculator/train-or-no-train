@@ -11,7 +11,7 @@ const client = require('twilio')(accountSid, authToken);
 
 client.calls
       .create({
-         url: 'https://raw.githubusercontent.com/pocketcalculator/train-or-no-train/refs/heads/main/notify-rr/voice_notify_xml',
+         twiml: "<Response><Say voice=\"woman\">A train is currently blocking crossing number 7, 1, 8, 0, 7, 9, N, as in Nancy.  Once again, a A train is currently blocking crossing number 7, 1, 8, 0, 7, 9, N, as in Nancy.  Thank you for moving this train.</Say><Play>https://msft2025trainornotrain.blob.core.windows.net/web/gladys-knight-and-the-pips-midnight-train-to-georgia.mp3</Play></Response>",
          to: DESTINATION_PHONE_NUMBER,
          from: TWILIO_SOURCE_PHONE_NUMBER,
        })
