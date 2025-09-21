@@ -1,0 +1,4 @@
+<Response>
+<Say voice="woman">A train is currently blocking crossing number 7 1 8 0 7 9 N as in Nancy.  Once again, a A train is currently blocking crossing number 7 1 8 0 7 9 N as in Nancy.  Thank you for moving this train.</Say>
+<Play>http://demo.twilio.com/docs/classic.mp3</Play>
+</Response>
