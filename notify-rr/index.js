@@ -11,7 +11,7 @@ const client = require('twilio')(accountSid, authToken);
 
 client.calls
       .create({
-         url: 'http://demo.twilio.com/docs/voice.xml',
+         url: 'https://raw.githubusercontent.com/pocketcalculator/train-or-no-train/refs/heads/main/notify-rr/voice_notify_xml',
          to: DESTINATION_PHONE_NUMBER,
          from: TWILIO_SOURCE_PHONE_NUMBER,
        })
