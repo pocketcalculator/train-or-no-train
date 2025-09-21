@@ -5,13 +5,21 @@ Simple script to send a one-time message from Raspberry Pi to Azure IoT Hub
 
 import asyncio
 import json
+import os
 import platform
 from datetime import datetime
 from azure.iot.device.aio import IoTHubDeviceClient
 from azure.iot.device import Message
+from dotenv import load_dotenv
 
-# IoT Hub connection string - replace with your device connection string
-CONNECTION_STRING = "HostName=YOUR_IOT_HUB.azure-devices.net;DeviceId=YOUR_DEVICE_ID;SharedAccessKey=YOUR_SHARED_ACCESS_KEY"
+# Load environment variables from .env file
+load_dotenv()
+
+# IoT Hub connection string from environment variable
+CONNECTION_STRING = os.getenv('AZURE_IOT_CONNECTION_STRING')
+
+if not CONNECTION_STRING:
+    raise ValueError("AZURE_IOT_CONNECTION_STRING environment variable is required. Please set it in your .env file.")
 async def send_telemetry_message():
     """
     Send a single telemetry message to Azure IoT Hub

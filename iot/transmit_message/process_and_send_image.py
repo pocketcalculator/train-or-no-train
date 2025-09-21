@@ -24,6 +24,10 @@ from PIL import Image, ExifTags
 from PIL.PngImagePlugin import PngInfo
 from azure.iot.device.aio import IoTHubDeviceClient
 from azure.iot.device import Message
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Import the image processing functions
 sys.path.append('/home/kb1hgo/image')
@@ -33,8 +37,15 @@ from process_image import process_single_image, get_image_metadata
 INCOMING_DIR = Path('/home/kb1hgo/image/incoming')
 PROCESSING_DIR = Path('/home/kb1hgo/image/processing')
 
-# IoT Hub connection string - replace with your actual connection string
-CONNECTION_STRING = "HostName=YOUR_IOT_HUB.azure-devices.net;DeviceId=YOUR_DEVICE_ID;SharedAccessKey=YOUR_SHARED_ACCESS_KEY"
+# Configuration from environment variables with defaults
+IMAGE_QUALITY = int(os.getenv('IMAGE_QUALITY', '85'))
+MAX_IMAGE_SIZE = int(os.getenv('MAX_IMAGE_SIZE', '1024'))
+
+# IoT Hub connection string from environment variable
+CONNECTION_STRING = os.getenv('AZURE_IOT_CONNECTION_STRING')
+
+if not CONNECTION_STRING:
+    raise ValueError("AZURE_IOT_CONNECTION_STRING environment variable is required. Please set it in your .env file.")
 def find_image_in_incoming():
     """Find the first image file in the incoming directory."""
     image_extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.tiff', '.tif', '.webp'}

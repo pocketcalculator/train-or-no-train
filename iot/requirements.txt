@@ -1,0 +1,5 @@
+# IoT Components Dependencies
+python-dotenv==1.0.0
+azure-iot-device==2.12.0
+Pillow==10.0.0
+opencv-python==4.8.1.78

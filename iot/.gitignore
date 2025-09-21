@@ -1,0 +1,31 @@
+# IoT specific environment files
+.env
+.env.local
+.env.production
+.env.staging
+
+# Python specific
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.pyc
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Image processing directories
+incoming/
+processing/
+output/
+
+# IoT device logs
+*.log
+logs/
+
+# Temporary files
+temp/
+tmp/
