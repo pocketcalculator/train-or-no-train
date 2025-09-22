@@ -1,19 +1,37 @@
 #!/usr/bin/env python3
 """
-Extract Metadata from Processed PNG
+Extract Metadata from Processed JPG
 
-This script extracts and displays metadata from processed PNG files
-in a format similar to exiftool output.
+This script extracts and displays metadata from processed JPG files,
+focusing on EXIF data.
 """
 
 import sys
-import json
-import base64
 from pathlib import Path
 from PIL import Image
+import piexif
+import piexif.helper
 
-def extract_png_metadata(image_path):
-    """Extract and display metadata from a processed PNG file."""
+def format_value(value):
+    """Format EXIF values for display."""
+    if isinstance(value, bytes):
+        # Try to decode bytes, otherwise show as hex
+        try:
+            # For user comments and other text fields
+            if value.startswith(b'UNICODE\x00'):
+                return value[8:].decode('utf-16')
+            return value.decode('utf-8', errors='ignore').strip('\x00')
+        except:
+            return value.hex()
+    if isinstance(value, tuple) and len(value) == 2:
+        # Rational numbers (like aperture, exposure time)
+        if value[1] != 0:
+            return f"{value[0]}/{value[1]} ({value[0]/value[1]:.4f})"
+        return f"{value[0]}/{value[1]}"
+    return value
+
+def extract_jpg_metadata(image_path):
+    """Extract and display metadata from a processed JPG file."""
     image_path = Path(image_path)
     
     if not image_path.exists():
@@ -28,71 +46,53 @@ def extract_png_metadata(image_path):
             print(f"Format: {img.format}")
             print(f"Color Mode: {img.mode}")
             print()
-            
-            # Extract EXIF data from JSON
-            if 'EXIF' in img.info:
-                try:
-                    exif_data = json.loads(img.info['EXIF'])
-                    print("EXIF Data (from JSON):")
+
+            # Load EXIF data using piexif
+            try:
+                exif_data = piexif.load(str(image_path))
+                
+                # Display UserComment if it exists
+                if piexif.ExifIFD.UserComment in exif_data.get("Exif", {}):
+                    user_comment = piexif.helper.UserComment.load(exif_data["Exif"][piexif.ExifIFD.UserComment])
+                    print(f"User Comment: {user_comment}")
                     print("-" * 40)
+
+                # Iterate through the different EXIF sections (IFDs)
+                for ifd_name in sorted(exif_data.keys()):
+                    if ifd_name == "thumbnail":
+                        print("Thumbnail: Present" if exif_data[ifd_name] else "Thumbnail: None")
+                        continue
                     
-                    # Sort and display EXIF data
-                    for key, value in sorted(exif_data.items()):
-                        if key == 'GPSInfo' and isinstance(value, dict):
-                            print(f"{key:20}: GPS coordinates available")
-                            # Show GPS details if available
-                            if '2' in value and '4' in value:  # Latitude and Longitude
-                                lat = value.get('2', 'N/A')
-                                lon = value.get('4', 'N/A')
-                                lat_ref = value.get('1', '')
-                                lon_ref = value.get('3', '')
-                                print(f"{'GPS Latitude':20}: {lat} {lat_ref}")
-                                print(f"{'GPS Longitude':20}: {lon} {lon_ref}")
-                        elif isinstance(value, (str, int, float)):
-                            # Truncate very long values
-                            if isinstance(value, str) and len(value) > 50:
-                                print(f"{key:20}: {value[:47]}...")
-                            else:
-                                print(f"{key:20}: {value}")
-                        elif isinstance(value, list) and len(value) <= 3:
-                            print(f"{key:20}: {value}")
-                        else:
-                            print(f"{key:20}: [Complex data]")
+                    print(f"--- {ifd_name} IFD ---")
                     
+                    # Sort tags for consistent output
+                    sorted_tags = sorted(exif_data[ifd_name].keys())
+                    
+                    for tag in sorted_tags:
+                        tag_name = piexif.TAGS.get(ifd_name, {}).get(tag, {}).get("name", "Unknown")
+                        value = exif_data[ifd_name][tag]
+                        
+                        # Truncate very long values
+                        formatted_val = format_value(value)
+                        if isinstance(formatted_val, str) and len(formatted_val) > 100:
+                            formatted_val = formatted_val[:97] + "..."
+                            
+                        print(f"{tag_name:25} (0x{tag:04x}): {formatted_val}")
                     print()
-                except json.JSONDecodeError:
-                    print("EXIF data present but not valid JSON")
-            
-            # Show other metadata
-            other_data = {k: v for k, v in img.info.items() if k not in ['EXIF', 'Raw_EXIF', 'icc_profile']}
-            if other_data:
-                print("Other Metadata:")
-                print("-" * 40)
-                for key, value in other_data.items():
-                    print(f"{key:20}: {value}")
-                print()
-            
-            # Show technical info
-            if 'icc_profile' in img.info:
-                print(f"ICC Profile: Present ({len(img.info['icc_profile'])} bytes)")
-            
-            if 'Raw_EXIF' in img.info:
-                try:
-                    raw_exif = base64.b64decode(img.info['Raw_EXIF'])
-                    print(f"Raw EXIF Data: Present ({len(raw_exif)} bytes)")
-                except:
-                    print("Raw EXIF Data: Present but decode failed")
-                    
+
+            except Exception as e:
+                print(f"Could not read EXIF data: {e}")
+
     except Exception as e:
         print(f"Error reading {image_path}: {e}")
 
 def main():
     if len(sys.argv) != 2:
-        print("Usage: python3 extract_metadata.py <png_file>")
-        print("Example: python3 extract_metadata.py processing/photo_processed.png")
+        print("Usage: python3 extract_metadata.py <jpg_file>")
+        print("Example: python3 extract_metadata.py processing/photo_processed.jpg")
         sys.exit(1)
     
-    extract_png_metadata(sys.argv[1])
+    extract_jpg_metadata(sys.argv[1])
 
 if __name__ == "__main__":
     main()

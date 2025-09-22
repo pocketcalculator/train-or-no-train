@@ -1,102 +1,110 @@
-# Image Processing Scripts
+# Image Processing Script
 
-This directory contains scripts for processing images by resizing them to reduce file size while preserving metadata and converting to PNG format.
+This directory contains a Python script to process images, primarily for preparing them for use in object detection models or for consistent archiving. The script resizes, compresses, and watermarks images.
 
 ## Files
 
-- `process_image.py`: Main Python script for image processing
-- `process_images.sh`: Bash utility script for easy batch processing
-- `incoming/`: Directory containing images to be processed
-- `processing/`: Directory where processed images are saved
-- `archived/`: Directory for storing original images after processing
+- `process_image.py`: The main Python script for image processing.
+- `process_images.sh`: A bash utility script for easier command-line usage.
+- `README.md`: This documentation.
+- `incoming/`: Directory where you should place images to be processed.
+- `processing/`: Directory where processed images are saved.
+- `archived/`: Directory where original images are moved after processing (if the archive option is used).
+- `processing/intersection_data.json`: (Optional) A JSON file containing key-value pairs to be added to the watermark.
 
 ## Features
 
-- **Size Reduction**: Intelligently resizes images to target file size (default: 500KB)
-- **Metadata Preservation**: Keeps all EXIF data and other metadata intact
-- **PNG Conversion**: Converts images to PNG format while preserving quality
-- **Batch Processing**: Can process individual files or entire directories
-- **Archiving**: Option to move original files to archived directory
+- **Fixed Resize**: Resizes all images to a standard `1024x768` resolution, ignoring the original aspect ratio.
+- **Targeted Compression**: Adjusts JPEG quality to bring the file size under a specified target (default: 100 KB).
+- **Watermarking**: Adds a semi-transparent watermark containing the image timestamp (from EXIF data) and custom data from `processing/intersection_data.json`.
+- **Metadata Preservation**: Preserves original EXIF metadata in the processed JPG files.
+- **Batch Processing**: Can process a single image or all images in the `incoming` directory.
+- **Archiving**: Includes an option to move original files to the `archived` directory after successful processing.
 
 ## Usage
 
-### Using the Python Script Directly
+### Using the Python Script (`process_image.py`)
+
+The Python script is the core of the processing logic.
 
 ```bash
-# Process a specific image
-python3 process_image.py PXL_20250916_003238285.jpg
+# Process a specific image with default settings (target size 100 KB)
+python3 process_image.py my_photo.jpg
 
-# Process all images in incoming directory
+# Process all images in the 'incoming' directory
 python3 process_image.py
 
-# Process with custom target size (300KB)
-python3 process_image.py --size 300
+# Process with a custom target size (e.g., 45 KB)
+python3 process_image.py --size 45
 
-# Process and archive original files
+# Process and archive the original files
 python3 process_image.py --archive
 
-# Process specific file with custom size and archive
-python3 process_image.py PXL_20250916_003238285.jpg --size 300 --archive
+# Combine options: process a specific file with a custom size and archive it
+python3 process_image.py my_photo.jpg --size 45 --archive
 ```
 
-### Using the Bash Utility Script
+### Using the Bash Utility (`process_images.sh`)
+
+The bash script is a convenient wrapper for the Python script.
 
 ```bash
-# Process all images
+# Process all images in the 'incoming' directory
 ./process_images.sh
 
 # Process a specific image
-./process_images.sh photo.jpg
+./process_images.sh my_photo.jpg
 
-# Process with custom target size
-./process_images.sh size 300
+# Process all images with a custom target size (e.g., 45 KB)
+./process_images.sh size 45
 
-# Process and archive originals
+# Process all images and archive the originals
 ./process_images.sh archive
 ```
 
 ## How It Works
 
-1. **Metadata Extraction**: Reads all EXIF and other metadata from the original image
-2. **Smart Resizing**: Calculates optimal dimensions to achieve target file size while maintaining aspect ratio
-3. **High-Quality Resampling**: Uses Lanczos resampling for best quality during resize
-4. **Metadata Transfer**: Embeds original metadata into the PNG file
-5. **Format Conversion**: Saves as optimized PNG with preserved metadata
+1.  **Load Image**: Opens the specified JPG image from the `incoming` directory.
+2.  **Extract Metadata**: Reads the EXIF data from the original image to preserve it.
+3.  **Resize**: Resizes the image to `1024x768` using a high-quality Lanczos filter.
+4.  **Apply Watermark**:
+    *   Reads the timestamp from the EXIF data.
+    *   Loads key-value pairs from `processing/intersection_data.json` (if it exists).
+    *   Draws a semi-transparent black background in the bottom-left corner.
+    *   Draws the timestamp and JSON data as lime green text on the background.
+5.  **Compress**: Iteratively saves the image with decreasing JPEG quality until the file size is below the target.
+6.  **Save Image**: Saves the final processed image as a JPG file in the `processing` directory, with `_processed.jpg` appended to the original filename.
+7.  **Archive (Optional)**: If the `--archive` flag is used, the original image is moved from `incoming/` to `archived/`.
 
 ## Example Output
 
 ```
-Processing: PXL_20250916_003238285.jpg
-  Original: 8160x6144, 9076.3 KB
-  Processed: 816x614, 694.4 KB
-  Saved to: /home/kb1hgo/image/processing/PXL_20250916_003238285_processed.png
-  Size reduction: 92.3%
+Processing: PXL_20250921_123456789.jpg
+  Original: 4032x3024, 3450.2 KB
+  Warning: intersection_data.json not found. Watermark will be incomplete.
+  Achieved target size: 98.7 KB with quality=75
+  Saved to: processing/PXL_20250921_123456789_processed.jpg
+  Size reduction: 97.1%
 ```
 
 ## Requirements
 
 - Python 3.x
-- Pillow (PIL) library
-- piexif library (for advanced EXIF handling)
-
-Both libraries are already installed in this environment.
+- Pillow (`PIL`) library
+- `piexif` library
 
 ## Directory Structure
 
 ```
-/home/kb1hgo/image/
+.
 ├── process_image.py          # Main processing script
 ├── process_images.sh         # Bash utility script
-├── README.md                # This documentation
-├── incoming/                # Place images here for processing
-├── processing/              # Processed images appear here
-└── archived/                # Original images moved here when archived
+├── README.md                 # This documentation
+├── incoming/                 # Place images here for processing
+│   └── my_photo.jpg
+├── processing/               # Processed images appear here
+│   ├── intersection_data.json  # (Optional) data for watermarks
+│   └── my_photo_processed.jpg
+└── archived/                 # Original images moved here when archived
+    └── my_photo.jpg
 ```
-
-## Notes
-
-- The script preserves image quality while significantly reducing file size
-- Transparency is maintained for images that support it
-- The target size is approximate - actual size may vary slightly
-- Original images remain in incoming/ unless --archive option is used
-- All processed images are saved with "_processed.png" suffix
